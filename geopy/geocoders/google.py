@@ -10,6 +10,12 @@ from xml.parsers.expat import ExpatError
 from geopy.geocoders.base import Geocoder
 from geopy import Point, Location, util
 
+class GeoStatusError(Exception):
+    """ Raised when any status other than 200 is returned """
+    def __init__(self, status):
+        self.status = status
+        super(GeoStatusError, self).__init__("Unexpected status returned from Google: %s" % self.status)
+
 class Google(Geocoder):
     """Geocoder using the Google Maps API."""
     
@@ -135,6 +141,9 @@ class Google(Geocoder):
         if not isinstance(page, basestring):
             page = util.decode_page(page)
         json = simplejson.loads(page)
+        status = json.get('Status',{}).get('code')
+        if status != 200:
+            raise GeoStatusError(status)
         places = json.get('Placemark', [])
 
         if (exactly_one and len(places) != 1) and (not reverse):
