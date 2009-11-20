@@ -36,10 +36,11 @@ class Yahoo(Geocoder):
     def parse_xml(self, page):
         if not isinstance(page, basestring):
             page = util.decode_page(page)
-
+        
         doc = xml.dom.minidom.parseString(page)
         results = doc.getElementsByTagName('Result')
-
+        precision = results[0].getAttribute('precision')
+        
         def parse_result(result):
             strip = ", \n"
             address = util.get_first_text(result, 'Address', strip)
@@ -61,7 +62,8 @@ class Yahoo(Geocoder):
                 'City': city,
                 'State': state,
                 'Zip': zip,
-                'Country': country
+                'Country': country,
+                'precision': precision
             })
 
         return [parse_result(result) for result in results]
