@@ -74,11 +74,11 @@ class Google(Geocoder):
         return self.geocode_url(url, exactly_one)
 
     def reverse(self, coord, exactly_one=True):
-	(lat,lng) = coord
-	params = {'q': self.format_string % lat+','+self.format_string % lng,
-		  'output': self.output_format.lower()
-		  }
-	if self.resource.rstrip('/').endswith('geo'):
+    (lat,lng) = coord
+    params = {'q': self.format_string % lat+','+self.format_string % lng,
+          'output': self.output_format.lower()
+          }
+    if self.resource.rstrip('/').endswith('geo'):
             # An API key is only required for the HTTP geocoder.
             params['key'] = self.api_key
 
@@ -105,8 +105,8 @@ class Google(Geocoder):
             places = doc.getElementsByTagName('Placemark')
 
         if (exactly_one and len(places) != 1) and (not reverse):
-	    raise ValueError("Didn't find exactly one placemark! " \
-			     "(Found %d.)" % len(places))
+        raise ValueError("Didn't find exactly one placemark! " \
+                 "(Found %d.)" % len(places))
         
         def parse_place(place):
             location = util.get_first_text(place, ['address', 'name']) or None
