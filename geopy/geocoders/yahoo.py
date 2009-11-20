@@ -55,7 +55,7 @@ class Yahoo(Geocoder):
             if latitude and longitude:
                 point = Point(latitude, longitude)
             else:
-                point = Non
+                point = None
             return Location(location, point, {
                 'Address': address,
                 'City': city,
