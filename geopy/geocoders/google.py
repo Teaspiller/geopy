@@ -148,8 +148,8 @@ class Google(Geocoder):
             # Add support for pulling out the canonical name
             locality = place.get('AddressDetails',{}).get('Country',{}).get('AdministrativeArea',{}).get('Locality',{}).get('LocalityName')
             administrative = place.get('AddressDetails',{}).get('Country',{}).get('AdministrativeArea',{}).get('AdministrativeAreaName')
-
-            return util.RichResult((location, (latitude, longitude)), locality=locality, administrative=administrative)
+            accuracy = place.get('AddressDetails',{}).get('Accuracy')
+            return util.RichResult((location, (latitude, longitude)), locality=locality, administrative=administrative, accuracy=accuracy)
         
         if exactly_one:
             return parse_place(places[0])
