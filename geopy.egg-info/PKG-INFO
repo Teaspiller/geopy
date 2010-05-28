@@ -1,12 +1,12 @@
 Metadata-Version: 1.0
 Name: geopy
-Version: 0.93dev-r76
+Version: 0.93-f1dev
 Summary: Python Geocoding Toolbox
-Home-page: http://exogen.case.edu/projects/geopy/
+Home-page: http://github.com/sneeu/geopy
 Author: Brian Beck
 Author-email: exogen@gmail.com
 License: MIT
-Download-URL: http://geopy.googlecode.com/svn/trunk/
+Download-URL: git://github.com/sneeu/geopy.git
 Description: UNKNOWN
 Keywords: geocode geocoding gis geographical maps earth distance
 Platform: UNKNOWN
