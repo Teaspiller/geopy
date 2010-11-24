@@ -103,18 +103,8 @@ class YahooPlaceFinder(Geocoder):
                 "(Found %d.)" % len(results))
                 
         def parse_result(result):
-            line1 = result.get('line1', '')
-            line2 = result.get('line2', '')
-            line3 = result.get('line3', '')
-            line4 = result.get('line4', '')
-            uzip = result.get('uzip', '')
-            
-            #house = result.get('house', '')
-            #address_str = util.join_filter(", ", [city, state_str, country_str])
-            #city = result.get('city', '')
-            #state_str = '%s (%s)' % (result.get('state', ''), result.get('statecode', ''))
-            #country_str = '%s (%s) %s' % (result.get('country', ''), result.get('countrycode', ''), result.get('uzip', ''))            
-            location = util.join_filter(" ", [line1, line2, line3, uzip, line4])
+            location = "%(house)s %(street)s %(city)s %(state)s (%(statecode)s) %(country)s (%(countrycode)s) %(uzip)s" % result 
+            location = location.strip().replace('  ','')
             
             latitude = result.get('latitude')
             longitude = result.get('longitude')
