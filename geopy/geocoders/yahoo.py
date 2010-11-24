@@ -1,10 +1,12 @@
-import xml.dom.minidom
-from geopy import util
-from geopy import Point, Location
+import json
+import logging
 from urllib import urlencode
 from urllib2 import urlopen, HTTPError
+import xml.dom.minidom
+
+from geopy import util
+from geopy import Point, Location
 from geopy.geocoders.base import Geocoder
-import logging
 
 log = logging.getLogger(__name__)
 
@@ -65,5 +67,69 @@ class Yahoo(Geocoder):
                 'Country': country,
                 'precision': precision
             })
-
+        
+        # Todo: exactly_one needs to be here?
         return [parse_result(result) for result in results]
+
+
+class YahooPlaceFinder(Geocoder):
+
+    BASE_URL = "http://where.yahooapis.com/geocode?%s"
+
+    def __init__(self, app_id):
+        self.app_id = app_id
+        
+    def geocode(self, string, exactly_one=True):
+        params = {  'flags': 'j',  #json
+                    'q': string 
+                 }
+        url = self.BASE_URL % urlencode(params)
+        return self.geocode_url(url, exactly_one)
+
+    def geocode_url(self, url, exactly_one=True):
+        log.debug("Fetching %s..." % url)
+        page = urlopen(url)
+        
+        parse = getattr(self, 'parse_json')
+        return parse(page, exactly_one)
+
+    def parse_json(self, page, exactly_one=True):
+        json_str = page.read()
+        parsed = json.loads(json_str)
+        results = parsed['ResultSet']['Results']
+        
+        if (exactly_one and len(results) != 1):
+            raise ValueError("Didn't find exactly one placemark! " \
+                "(Found %d.)" % len(results))
+                
+        def parse_result(result):
+            line1 = result.get('line1', '')
+            line2 = result.get('line2', '')
+            line3 = result.get('line3', '')
+            line4 = result.get('line4', '')
+            uzip = result.get('uzip', '')
+            
+            #house = result.get('house', '')
+            #address_str = util.join_filter(", ", [city, state_str, country_str])
+            #city = result.get('city', '')
+            #state_str = '%s (%s)' % (result.get('state', ''), result.get('statecode', ''))
+            #country_str = '%s (%s) %s' % (result.get('country', ''), result.get('countrycode', ''), result.get('uzip', ''))            
+            location = util.join_filter(" ", [line1, line2, line3, uzip, line4])
+            
+            latitude = result.get('latitude')
+            longitude = result.get('longitude')
+            if latitude and longitude:
+                point = Point(float(latitude), float(longitude))
+            else:
+                point = None
+            
+            return Location(location, point, result)
+        
+        # Todo: Fix: Not sure how to return results here
+        # The geocoders_old seem to be returning a different format.
+        # need to make these as consistent.
+        if exactly_one:
+            return parse_result(results[0])
+        else:
+            return (parse_result(result) for result in results)
+        
