@@ -96,7 +96,11 @@ class YahooPlaceFinder(Geocoder):
     def parse_json(self, page, exactly_one=True):
         json_str = page.read()
         parsed = json.loads(json_str)
-        results = parsed['ResultSet']['Results']
+        try:
+            results = parsed['ResultSet']['Results']
+        except:
+            log.error('No results found for %s' % json_str)
+            results = []
         
         if (exactly_one and len(results) != 1):
             raise ValueError("Didn't find exactly one placemark! " \
